@@ -4,6 +4,12 @@ const cheerio = require("cheerio");
 
 const app = express();
 
+/*
+==================================================
+CHECK EMS VNPOST
+==================================================
+*/
+
 app.get("/check/:code", async (req, res) => {
 
   const code = req.params.code;
@@ -23,66 +29,99 @@ app.get("/check/:code", async (req, res) => {
 
     const $ = cheerio.load(html);
 
-    const bodyText = $("body").text();
+    const bodyText =
+      $("body").text();
 
     let status = "🚚 ĐANG GỬI";
 
     /*
-    ========================================
-    ĐÃ PHÁT
-    ========================================
+    ==================================================
+    ƯU TIÊN CHECK ĐÃ PHÁT
+    ==================================================
     */
 
     if (
+
       bodyText.includes("Đã phát thành công") ||
+
       bodyText.includes("Đã phát hoàn thành công")
+
     ) {
 
-      status = "✅ ĐÃ PHÁT THÀNH CÔNG";
+      status =
+        "✅ ĐÃ PHÁT THÀNH CÔNG";
     }
 
     /*
-    ========================================
-    HOÀN
-    ========================================
+    ==================================================
+    CHECK HOÀN THƯ
+    ==================================================
     */
 
     else if (
-      bodyText.includes("hoàn") ||
-      bodyText.includes("Hoàn")
+
+      bodyText.includes("Hoàn về người gửi") ||
+
+      bodyText.includes("Bưu gửi đã chuyển hoàn")
+
     ) {
 
-      status = "❌ HOÀN THƯ";
+      status =
+        "❌ HOÀN THƯ";
     }
 
     /*
-    ========================================
-    ĐANG GỬI
-    ========================================
+    ==================================================
+    CÒN LẠI
+    ==================================================
     */
 
     else {
 
-      status = "🚚 ĐANG GỬI";
+      status =
+        "🚚 ĐANG GỬI";
     }
 
+    /*
+    ==================================================
+    RESPONSE
+    ==================================================
+    */
+
     res.json({
+
       success: true,
+
       code: code,
+
       status: status
+
     });
 
-  } catch(err) {
+  }
+
+  catch(err) {
 
     res.json({
+
       success: false,
+
       error: err.toString()
+
     });
   }
 });
 
-const PORT = process.env.PORT || 3000;
+/*
+==================================================
+START SERVER
+==================================================
+*/
+
+const PORT =
+  process.env.PORT || 3000;
 
 app.listen(PORT, () => {
+
   console.log("Server running");
 });
