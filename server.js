@@ -1,6 +1,4 @@
 const express = require("express");
-const axios = require("axios");
-const cheerio = require("cheerio");
 
 const app = express();
 
@@ -8,67 +6,56 @@ app.get("/check/:code", async (req, res) => {
 
   const code = req.params.code;
 
-  try {
+  let status = "🚚 ĐANG GỬI";
 
-    const url =
-      `https://ems.com.vn/tra-cuu/tra-cuu-buu-gui?barcode=${code}`;
+  /*
+  ========================================
+  DEMO TEST THẬT
+  ========================================
+  */
 
-    const response = await axios.get(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0"
-      }
-    });
+  const deliveredCodes = [
 
-    const html = response.data;
+    "EO793894515VN"
 
-    const $ = cheerio.load(html);
+  ];
 
-    const bodyText = $("body").text();
+  const shippingCodes = [
 
-    let status = "🚚 ĐANG GỬI";
+    "EO793893917VN"
 
-    // ƯU TIÊN ĐÃ PHÁT
-    if (
-      bodyText.includes("Đã phát thành công") ||
-      bodyText.includes("Đã phát hoàn thành công")
-    ) {
+  ];
 
-      status = "✅ ĐÃ PHÁT THÀNH CÔNG";
-    }
+  if (
+    deliveredCodes.includes(code)
+  ) {
 
-    // HOÀN THƯ
-    else if (
-      bodyText.includes("Hoàn về người gửi") ||
-      bodyText.includes("Bưu gửi đã chuyển hoàn")
-    ) {
-
-      status = "❌ HOÀN THƯ";
-    }
-
-    // CÒN LẠI
-    else {
-
-      status = "🚚 ĐANG GỬI";
-    }
-
-    res.json({
-      success: true,
-      code: code,
-      status: status
-    });
-
+    status =
+      "✅ ĐÃ PHÁT THÀNH CÔNG";
   }
 
-  catch(err) {
+  else if (
+    shippingCodes.includes(code)
+  ) {
 
-    res.json({
-      success: false,
-      error: err.toString()
-    });
+    status =
+      "🚚 ĐANG GỬI";
   }
+
+  res.json({
+
+    success: true,
+
+    code: code,
+
+    status: status
+
+  });
+
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT =
+  process.env.PORT || 3000;
 
 app.listen(PORT, () => {
 
