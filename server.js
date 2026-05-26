@@ -11,7 +11,7 @@ app.get("/check/:code", async (req, res) => {
   try {
 
     const url =
-      `https://viettelpost.com.vn/tra-cuu-hanh-trinh-don/?billcode=${code}`;
+      `https://ems.com.vn/tra-cuu/tra-cuu-buu-gui?barcode=${code}`;
 
     const response = await axios.get(url, {
       headers: {
@@ -27,16 +27,43 @@ app.get("/check/:code", async (req, res) => {
 
     let status = "🚚 ĐANG GỬI";
 
-    if (bodyText.includes("Phát thành công")) {
+    /*
+    ========================================
+    ĐÃ PHÁT
+    ========================================
+    */
+
+    if (
+      bodyText.includes("Đã phát thành công") ||
+      bodyText.includes("Đã phát hoàn thành công")
+    ) {
+
       status = "✅ ĐÃ PHÁT THÀNH CÔNG";
     }
 
-    else if (bodyText.includes("Hoàn")) {
+    /*
+    ========================================
+    HOÀN
+    ========================================
+    */
+
+    else if (
+      bodyText.includes("hoàn") ||
+      bodyText.includes("Hoàn")
+    ) {
+
       status = "❌ HOÀN THƯ";
     }
 
-    else if (bodyText.includes("Đã nhận")) {
-      status = "📦 NGƯỜI NHẬN ĐÃ NHẬN";
+    /*
+    ========================================
+    ĐANG GỬI
+    ========================================
+    */
+
+    else {
+
+      status = "🚚 ĐANG GỬI";
     }
 
     res.json({
